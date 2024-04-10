@@ -1,0 +1,100 @@
+/**
+ * These arguments were used when this file was generated. They will be automatically applied on subsequent loads
+ * via the GUI or CLI. Run CLI with '--help' for additional information on how to override these arguments.
+ * @cliArgs --device "F280015x" --package "80PN" --part "F280015x_80PN" --context "system" --product "C2000WARE@5.01.00.00"
+ * @versions {"tool":"1.19.0+3426"}
+ */
+
+/**
+ * Import the modules used in this configuration.
+ */
+const device_support = scripting.addModule("/driverlib/device_support.js");
+const gpio           = scripting.addModule("/driverlib/gpio.js", {}, false);
+const gpio1          = gpio.addInstance();
+const gpio2          = gpio.addInstance();
+const sci            = scripting.addModule("/driverlib/sci.js", {}, false);
+const sci1           = sci.addInstance();
+const sysctl         = scripting.addModule("/driverlib/sysctl.js");
+const FREERTOS       = scripting.addModule("/kernel/freertos_tool/FREERTOS", {}, false);
+const FREERTOS1      = FREERTOS.addInstance();
+const CMD            = scripting.addModule("/utilities/cmd_tool/cmd_syscfg/source/CMD");
+const CMD1           = CMD.addInstance();
+const CMD2           = CMD.addInstance();
+
+/**
+ * Write custom configuration values to the imported modules.
+ */
+gpio1.$name           = "LED1";
+gpio1.direction       = "GPIO_DIR_MODE_OUT";
+gpio1.padConfig       = "OD";
+gpio1.gpioPin.$assign = "GPIO31";
+
+gpio2.$name           = "LED2";
+gpio2.direction       = "GPIO_DIR_MODE_OUT";
+gpio2.padConfig       = "OD";
+gpio2.gpioPin.$assign = "GPIO34";
+
+sci1.$name                 = "debugPort";
+sci1.registerInterrupts    = true;
+sci1.sci.sci_txPin.$assign = "GPIO29";
+
+FREERTOS1.$name                              = "myFREERTOS0";
+FREERTOS1.CPU_CLOCK_HZ                       = 120000000;
+FREERTOS1.xTaskGetSchedulerState             = true;
+FREERTOS1.xTaskGetCurrentTaskHandle          = true;
+FREERTOS1.xTaskAbortDelay                    = true;
+FREERTOS1.IDLE_SHOULD_YIELD                  = true;
+FREERTOS1.ENABLE_BACKWARD_COMPATIBILITY      = true;
+FREERTOS1.xTaskGetHandle                     = true;
+FREERTOS1.MAX_TASK_NAME_LEN                  = 20;
+FREERTOS1.USE_MUTEXES                        = true;
+FREERTOS1.tasks.create(1);
+FREERTOS1.tasks[0].$name                     = "myBlink1";
+FREERTOS1.tasks[0].taskPointer               = "myBlink1Task";
+FREERTOS1.tickTimer.timerInt.enableInterrupt = true;
+
+CMD1.$name                    = "generic_ram_lnk";
+CMD1.sectionMemory_text       = ["RAMLS0","RAMLS1"];
+CMD1.sectionMemory_ramfunc    = ["RAMM0"];
+CMD1.sectionMemory_cinit      = ["RAMM0"];
+CMD1.sectionMemory_stack      = ["RAMM1"];
+CMD1.sectionMemory_init_array = ["RAMM0"];
+CMD1.sectionMemory_bss        = ["RAMLS0"];
+CMD1.sectionMemory_const      = ["RAMLS0"];
+CMD1.sectionMemory_data       = ["RAMLS0"];
+CMD1.sectionMemory_switch     = ["RAMM0"];
+CMD1.sectionMemory_sysmem     = ["RAMLS0"];
+
+CMD2.$name                               = "generic_flash_lnk";
+CMD2.sectionAlignEnable_ramfunc          = true;
+CMD2.sectionAlignEnable_text             = true;
+CMD2.sectionAlignEnable_binit            = true;
+CMD2.sectionAlignEnable_cinit            = true;
+CMD2.sectionAlignEnable_switch           = true;
+CMD2.sectionAlignEnable_init_array       = true;
+CMD2.sectionAlignEnable_const            = true;
+CMD2.sectionAlignEnable_ovly             = true;
+CMD2.sectionMemory_codestart             = "0x080000";
+CMD2.sectionMemory_stack                 = ["RAMM1"];
+CMD2.sectionMemory_ramfunc               = ["FLASH_BANK0_SEC_0_7"];
+CMD2.sectionMemory_text                  = ["FLASH_BANK0_SEC_16_23","FLASH_BANK0_SEC_24_31","FLASH_BANK0_SEC_8_15"];
+CMD2.sectionMemory_binit                 = ["FLASH_BANK0_SEC_0_7"];
+CMD2.sectionMemory_cinit                 = ["FLASH_BANK0_SEC_0_7"];
+CMD2.sectionMemory_switch                = ["FLASH_BANK0_SEC_0_7"];
+CMD2.sectionMemory_bss                   = ["RAMLS0"];
+CMD2.sectionMemory_init_array            = ["FLASH_BANK0_SEC_0_7"];
+CMD2.sectionMemory_const                 = ["FLASH_BANK0_SEC_32_29"];
+CMD2.sectionMemory_data                  = ["RAMLS0"];
+CMD2.sectionMemory_sysmem                = ["RAMLS0"];
+CMD2.sectionMemory_ovly                  = ["FLASH_BANK0_SEC_0_7"];
+CMD2.sectionRunFromDifferentAddr_ramfunc = true;
+CMD2.sectionRun_ramfunc                  = ["RAMLS0"];
+CMD2.sectionBinit_ramfunc                = false;
+
+/**
+ * Pinmux solution for unlocked pins/peripherals. This ensures that minor changes to the automatic solver in a future
+ * version of the tool will not impact the pinmux you originally saw.  These lines can be completely deleted in order to
+ * re-solve from scratch.
+ */
+sci1.sci.$suggestSolution           = "SCIA";
+sci1.sci.sci_rxPin.$suggestSolution = "A16/C16, GPIO28";
